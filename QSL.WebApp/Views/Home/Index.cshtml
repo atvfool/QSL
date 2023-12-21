@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    @using(Html.BeginForm("generate", "Home"))
+    {
+        <div class="form-group">
+            <label for="callSign">Callsign</label>
+            <input type="text" name="callSign" class="form-control" />
+        </div>
+        <button id="submitButton" type="button" class="btn btn-primary">Generate</button>
+    }
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#submitButton").on('click', async function () {
+            let form = { 
+                Call: $("input[name='callSign']").val()
+            }
+            const response = await fetch("/Home/Generate", 
+            {
+                method:"POST", 
+                body:JSON.stringify(form)
+            });
+
+            console.log(response);
+
+        });
+    });
+</script>
