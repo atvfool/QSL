@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSL.WebApp", "QSL.WebApp\QSL.WebApp.csproj", "{DB48BF6B-3FA1-4C03-9509-87799F9312D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QSL.WebApp", "QSL.WebApp\QSL.WebApp.csproj", "{DB48BF6B-3FA1-4C03-9509-87799F9312D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSL.Renderer", "QSL.Renderer\QSL.Renderer.csproj", "{304E194E-6C1F-4DBF-9490-04371E97391B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QSL.Renderer", "QSL.Renderer\QSL.Renderer.csproj", "{304E194E-6C1F-4DBF-9490-04371E97391B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSL.Models", "QSL.Models\QSL.Models.csproj", "{6AA80B41-3581-47E3-909A-E2E541DCBBF2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QSL.Models", "QSL.Models\QSL.Models.csproj", "{6AA80B41-3581-47E3-909A-E2E541DCBBF2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ADIFLib", "ADIFLibCore\ADIFLib\ADIFLib.csproj", "{009FA087-E78D-4F12-8840-A7E8D7A07BBF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{6AA80B41-3581-47E3-909A-E2E541DCBBF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6AA80B41-3581-47E3-909A-E2E541DCBBF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6AA80B41-3581-47E3-909A-E2E541DCBBF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{009FA087-E78D-4F12-8840-A7E8D7A07BBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{009FA087-E78D-4F12-8840-A7E8D7A07BBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{009FA087-E78D-4F12-8840-A7E8D7A07BBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{009FA087-E78D-4F12-8840-A7E8D7A07BBF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

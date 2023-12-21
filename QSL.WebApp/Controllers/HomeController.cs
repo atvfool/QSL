@@ -8,6 +8,7 @@ namespace QSL.WebApp.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private const string API_URL = "https://logbook.qrz.com/api";
 
         public HomeController(ILogger<HomeController> logger)
         {
@@ -16,6 +17,13 @@ namespace QSL.WebApp.Controllers
 
         public IActionResult Index()
         {
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri(API_URL);
+
+            string content = "KEY=&ACTION=FETCH";
+
+
+            HttpResponseMessage response = client.PostAsync("", new StringContent(content)).Result;
             return View();
         }
 
@@ -28,6 +36,14 @@ namespace QSL.WebApp.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult Load()
+        {
+
+          
+
+            return View();
         }
 
         public IActionResult Generate(Log log)
