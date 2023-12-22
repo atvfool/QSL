@@ -5,6 +5,8 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Web;
 using ADIFLib;
+using QSL.Renderer;
+using System.IO.Compression;
 
 namespace QSL.WebApp.Controllers
 {
@@ -18,35 +20,10 @@ namespace QSL.WebApp.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public FileResult Index()
         {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(API_URL);
-
-            List<KeyValuePair<string, string>> content = new List<KeyValuePair<string, string>>();
-            content.Add(new KeyValuePair<string, string>("KEY", ""));
-            content.Add(new KeyValuePair<string, string>("ACTION", "FETCH"));
             
-            HttpResponseMessage response = client.PostAsync(string.Empty, new FormUrlEncodedContent(content)).Result;
-            string result = HttpUtility.HtmlDecode(response.Content.ReadAsStringAsync().Result);
-            NameValueCollection nvc = new NameValueCollection();
-            nvc = HttpUtility.ParseQueryString(result);
-            QRZResult qrz = new QRZResult() { 
-                RESULT = nvc["RESULT"],
-                COUNT = nvc["COUNT"],
-                ADIF = nvc["ADIF"],
-                LOGIDS = nvc["LOGIDS"]
-
-            };
-            string test = "";
-            ADIF adif = new ADIF();
-            adif.ReadFromString(qrz.ADIF);
-            foreach(ADIFQSO col in adif.TheQSOs)
-            {
-                test += col.Where(x => x.Name == "call").First().Data + "\r\n";
-            }
-
-            return View();
+            return Generate();
         }
 
         public IActionResult Privacy()
@@ -68,11 +45,61 @@ namespace QSL.WebApp.Controllers
             return View();
         }
 
-        public IActionResult Generate(Log log)
+        public FileResult Generate()
         {
             var i = 0;
-            
-            return View();
+            var QSOs = LoadLogs();
+
+            MemoryStream memStream = new MemoryStream();
+            using (var archive = new ZipArchive(memStream, ZipArchiveMode.Create, true)) {
+                foreach (var item in QSOs)
+                {
+                    Renderer.Renderer renderer = new Renderer.Renderer(item);
+                    var newImg = renderer.Generate();
+
+                    var newEntry = archive.CreateEntry(item.Where(x => x.Name == "call").First().Data + ".png");
+
+                    using (var entryStream = newEntry.Open())
+                    using (var sw = new StreamWriter(entryStream))
+                    {
+                        sw.Write(newImg);
+                    }
+                }
+            }
+            return File(memStream.ToArray(), "application/octet-stream");
+        }
+
+        private ADIFQSOCollection LoadLogs()
+        {
+            List<Log> result= new List<Log>();
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri(API_URL);
+
+            List<KeyValuePair<string, string>> content = new List<KeyValuePair<string, string>>();
+            content.Add(new KeyValuePair<string, string>("KEY", ""));
+            content.Add(new KeyValuePair<string, string>("ACTION", "FETCH"));
+
+            HttpResponseMessage response = client.PostAsync(string.Empty, new FormUrlEncodedContent(content)).Result;
+            string decode = HttpUtility.HtmlDecode(response.Content.ReadAsStringAsync().Result);
+            NameValueCollection nvc = new NameValueCollection();
+            nvc = HttpUtility.ParseQueryString(decode);
+            QRZResult qrz = new QRZResult()
+            {
+                RESULT = nvc["RESULT"],
+                COUNT = nvc["COUNT"],
+                ADIF = nvc["ADIF"],
+                LOGIDS = nvc["LOGIDS"]
+
+            };
+            string test = "";
+            ADIF adif = new ADIF();
+            adif.ReadFromString(qrz.ADIF);
+            foreach (ADIFQSO col in adif.TheQSOs)
+            {
+                test += col.Where(x => x.Name == "call").First().Data + "\r\n";
+            }
+
+            return adif.TheQSOs;
         }
     }
 }

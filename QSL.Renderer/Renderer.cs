@@ -3,6 +3,7 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp;
 using QSL.Models;
+using ADIFLib;
 
 namespace QSL.Renderer
 {
@@ -35,10 +36,28 @@ namespace QSL.Renderer
             this.log = log;
         }
 
+        public Renderer(ADIFQSO qso)
+        {
+            this.log = new Log()
+            {
+                Call = qso.Where(x => x.Name == "call").DefaultIfEmpty(new Token()).FirstOrDefault().Data,
+                Date = qso.Where(x => x.Name == "qso_date").DefaultIfEmpty(new Token()).FirstOrDefault().Data,
+                Time = qso.Where(x => x.Name == "time_off").DefaultIfEmpty(new Token()).FirstOrDefault().Data,
+                Band = qso.Where(x => x.Name == "band").DefaultIfEmpty(new Token()).FirstOrDefault().Data,
+                Freq = qso.Where(x => x.Name == "freq").DefaultIfEmpty(new Token()).FirstOrDefault().Data,
+                Send = qso.Where(x => x.Name == "rst_sent").DefaultIfEmpty(new Token()).FirstOrDefault().Data,
+                Receive = qso.Where(x => x.Name == "rst_send").DefaultIfEmpty(new Token()).FirstOrDefault().Data,
+                Mode = qso.Where(x => x.Name == "mode").DefaultIfEmpty(new Token()).FirstOrDefault().Data,
+                Power = qso.Where(x => x.Name == "tx_pwr").DefaultIfEmpty(new Token()).FirstOrDefault().Data
+
+            };
+        }
+
+
         public MemoryStream Generate()
         {
             MemoryStream memStream = new MemoryStream();
-            string path = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "StaticFiles"));
+            string path = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets"));
             string downloadsPath = string.Empty;
             using (var img = SixLabors.ImageSharp.Image.Load(Path.Combine(path, CARD_FILE)))
             {
