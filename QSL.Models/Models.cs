@@ -12,4 +12,11 @@
         public string Mode { get; set; } = string.Empty;
         public string Power { get; set; } = string.Empty;
     }
+    public class QRZResult
+    {
+        public string RESULT { get; set; } = string.Empty;
+        public string COUNT { get; set; } = string.Empty;
+        public string LOGIDS { get; set; } = string.Empty;
+        public string ADIF { get; set; } = string.Empty;
+    }
 }

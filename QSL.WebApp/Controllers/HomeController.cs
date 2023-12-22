@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QSL.Models;
 using QSL.WebApp.Models;
+using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Web;
+using ADIFLib;
 
 namespace QSL.WebApp.Controllers
 {
@@ -20,10 +23,29 @@ namespace QSL.WebApp.Controllers
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(API_URL);
 
-            string content = "KEY=&ACTION=FETCH";
+            List<KeyValuePair<string, string>> content = new List<KeyValuePair<string, string>>();
+            content.Add(new KeyValuePair<string, string>("KEY", ""));
+            content.Add(new KeyValuePair<string, string>("ACTION", "FETCH"));
+            
+            HttpResponseMessage response = client.PostAsync(string.Empty, new FormUrlEncodedContent(content)).Result;
+            string result = HttpUtility.HtmlDecode(response.Content.ReadAsStringAsync().Result);
+            NameValueCollection nvc = new NameValueCollection();
+            nvc = HttpUtility.ParseQueryString(result);
+            QRZResult qrz = new QRZResult() { 
+                RESULT = nvc["RESULT"],
+                COUNT = nvc["COUNT"],
+                ADIF = nvc["ADIF"],
+                LOGIDS = nvc["LOGIDS"]
 
+            };
+            string test = "";
+            ADIF adif = new ADIF();
+            adif.ReadFromString(qrz.ADIF);
+            foreach(ADIFQSO col in adif.TheQSOs)
+            {
+                test += col.Where(x => x.Name == "call").First().Data + "\r\n";
+            }
 
-            HttpResponseMessage response = client.PostAsync("", new StringContent(content)).Result;
             return View();
         }
 
