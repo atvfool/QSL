@@ -7,6 +7,7 @@ using System.Web;
 using ADIFLib;
 using QSL.Renderer;
 using System.IO.Compression;
+using System.Data.SqlTypes;
 
 namespace QSL.WebApp.Controllers
 {
@@ -55,18 +56,18 @@ namespace QSL.WebApp.Controllers
                 foreach (var item in QSOs)
                 {
                     Renderer.Renderer renderer = new Renderer.Renderer(item);
-                    var newImg = renderer.Generate();
+                    MemoryStream newImg = renderer.Generate();
+                    newImg.Seek(0, SeekOrigin.Begin);
 
-                    var newEntry = archive.CreateEntry(item.Where(x => x.Name == "call").First().Data + ".png");
+                    var newEntry = archive.CreateEntry(item.Where(x => x.Name == "qso_date").First().Data + item.Where(x => x.Name == "call").First().Data + ".png");
 
                     using (var entryStream = newEntry.Open())
-                    using (var sw = new StreamWriter(entryStream))
                     {
-                        sw.Write(newImg);
+                        newImg.CopyTo(entryStream);
                     }
                 }
             }
-            return File(memStream.ToArray(), "application/octet-stream");
+            return File(memStream.ToArray(), "application/octet-stream", "QSLs.zip");
         }
 
         private ADIFQSOCollection LoadLogs()

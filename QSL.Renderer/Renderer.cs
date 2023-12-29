@@ -46,7 +46,7 @@ namespace QSL.Renderer
                 Band = qso.Where(x => x.Name == "band").DefaultIfEmpty(new Token()).FirstOrDefault().Data,
                 Freq = qso.Where(x => x.Name == "freq").DefaultIfEmpty(new Token()).FirstOrDefault().Data,
                 Send = qso.Where(x => x.Name == "rst_sent").DefaultIfEmpty(new Token()).FirstOrDefault().Data,
-                Receive = qso.Where(x => x.Name == "rst_send").DefaultIfEmpty(new Token()).FirstOrDefault().Data,
+                Receive = qso.Where(x => x.Name == "rst_rcvd").DefaultIfEmpty(new Token()).FirstOrDefault().Data,
                 Mode = qso.Where(x => x.Name == "mode").DefaultIfEmpty(new Token()).FirstOrDefault().Data,
                 Power = qso.Where(x => x.Name == "tx_pwr").DefaultIfEmpty(new Token()).FirstOrDefault().Data
 
@@ -56,6 +56,7 @@ namespace QSL.Renderer
 
         public MemoryStream Generate()
         {
+            float y = 1120f;
             MemoryStream memStream = new MemoryStream();
             string path = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "assets"));
             string downloadsPath = string.Empty;
@@ -64,10 +65,10 @@ namespace QSL.Renderer
 
                 FontCollection fontCollection = new FontCollection();
                 FontFamily family = fontCollection.Add(Path.Combine(path, FONT_FILE));
-                Font font = family.CreateFont(90, FontStyle.Regular);
+                Font font = family.CreateFont(30, FontStyle.Regular);
                 RichTextOptions options = new(font)
                 {
-                    Origin = new PointF(500, 500),
+                    Origin = new PointF(165, y),
                     TabWidth = 8,
                     WrappingLength = 1000,
                     HorizontalAlignment = HorizontalAlignment.Left,
@@ -77,6 +78,28 @@ namespace QSL.Renderer
 
                 downloadsPath = Path.Combine(Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory), "newcard.png");
                 img.Mutate(x => x.DrawText(options, log.Call, brush));
+
+                options.Origin = new PointF(420, y);
+                img.Mutate(x => x.DrawText(options, log.Date, brush));
+
+                options.Origin = new PointF(595, y);
+                img.Mutate(x => x.DrawText(options, log.Time, brush));
+
+                options.Origin = new PointF(765, y);
+                img.Mutate(x => x.DrawText(options, log.Band, brush));
+
+                options.Origin = new PointF(945, y);
+                img.Mutate(x => x.DrawText(options, log.Freq, brush));
+
+                options.Origin = new PointF(1125, y);
+                img.Mutate(x => x.DrawText(options, log.Send + "/" + log.Receive, brush));
+
+                options.Origin = new PointF(1300, y);
+                img.Mutate(x => x.DrawText(options, log.Mode, brush));
+
+                options.Origin = new PointF(1470, y);
+                img.Mutate(x => x.DrawText(options, log.Power, brush));
+
                 img.Save(downloadsPath);
                 img.SaveAsPng(memStream);
             }
